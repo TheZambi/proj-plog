@@ -2,25 +2,25 @@
 initial([
               [empty,empty],                           %even
             [empty,empty,empty],                       %odd
-          [empty,empty,empty,purple],                   %even
-        [empty,empty,empty,purple,empty],               %odd
-      [empty,empty,empty,purple,empty,empty],           %even
-        [empty,empty,purple,empty,empty],               %odd
-      [empty,empty,purple,empty,empty,empty],           %even
-    [empty,empty,purple,empty,empty,empty,empty],       %odd
-      [empty,green,empty,empty,empty,empty],           %even
-    [green,green,empty,green,green,green,green],       %odd
-      [green,empty,green,green,green,green],           %even
-    [empty,empty,purple,empty,empty,empty,empty],
-      [empty,green,empty,empty,empty,empty],
-    [empty,empty,purple,empty,empty,empty,empty],
+          [empty,empty,empty,empty],                   %even
+        [empty,empty,empty,empty,empty],               %odd
+      [empty,empty,empty,empty,empty,empty],           %even
+        [empty,empty,empty,empty,empty],               %odd
+      [orange,empty,empty,empty,empty,orange],           %even
+    [orange,orange,orange,orange,orange,empty,orange],       %odd
+      [empty,orange,orange,orange,orange,empty],           %even
+    [orange,empty,empty,empty,empty,empty,orange],       %odd
+      [empty,empty,empty,empty,empty,empty],           %even
+    [orange,empty,empty,empty,empty,empty,orange],
       [empty,empty,empty,empty,empty,empty],
-    [empty,empty,purple,empty,empty,empty,empty],
-      [empty,empty,purple,empty,empty,empty],
-        [empty,purple,empty,empty,empty],
-      [empty,empty,purple,empty,empty,empty],
-        [empty,purple,empty,empty,empty],
-          [purple,empty,empty,empty],
+    [orange,empty,empty,empty,empty,empty,orange],
+      [empty,empty,empty,empty,empty,empty],
+    [empty,empty,empty,empty,empty,empty,empty],
+      [empty,empty,empty,empty,empty,empty],
+        [empty,empty,empty,empty,empty],
+      [empty,empty,empty,empty,empty,empty],
+        [empty,empty,empty,empty,empty],
+          [empty,empty,empty,empty],
             [empty,empty,empty],
               [empty,empty]
 ]).
@@ -181,12 +181,40 @@ display_alliances:-
     write('Player 1 alliances: To connect Orange: Orange-Green, to connect Green: Green-Purple, to connect Purple: Purple-Orange'), nl,
     write('Player 2 alliances: To connect Orange: Orange-Purple, to connect Green: Green-Orange, to connect Purple: Purple-Green'), nl.
 
+display_colors([Orange, Purple, Green | _]):-
+    (
+      (
+        Orange =\= -1,
+        PO is Orange+1,
+        write('Orange : Player '), write(PO), nl
+      ); 
+      write('Orange :'), nl
+    ),
+    (
+      (
+        Purple =\= -1,
+        PP is Purple+1,
+        write('Purple : Player '), write(PP), nl
+      ); 
+      write('Purple :'), nl
+    ),
+    (
+      (
+        Green =\= -1,
+        PG is Green+1,
+        write('Green : Player '), write(PG), nl
+      ); 
+      write('Green :'), nl
+    ).
+
 display_game(GameState,Player):-
+    [Board , Colors | _] = GameState,
     close_hex_top,
-    display_board(GameState,Player,0),
+    display_board(Board,Player,0),
     close_hex_bot,
     display_player(Player),
     display_remaining_pieces,
+    display_colors(Colors),
     display_alliances.
 
 display_winner(Winner):-

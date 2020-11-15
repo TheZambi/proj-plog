@@ -112,18 +112,38 @@ checkOrange(Board,PlayerOrange, Player):-
     ToVisit = [[0,0],[1,0],[2,0],[3,0],[4,0]] ,
     (
         (
+            allied(0,orange,Allied0),
             (
-                allied(0,orange,Allied0),
-                checkLine(Board,ToVisit,[],Allied0,orange),
-                Player0Orange is 0
-            ); true
-        );
+                (
+                    checkLine(Board,ToVisit,[],Allied0,orange,0), 
+                    Player0Orange is 0
+                );
+                (
+                    (
+                        \+checkLine(Board,ToVisit,[],Allied0,orange,1),
+                        Player1Orange is 1
+                    )
+                );  
+                true
+            )
+        ),
         (
+            allied(1,orange,Allied1),
             (
-                allied(1,orange,Allied1),
-                checkLine(Board,ToVisit,[],Allied1,orange),
-                Player1Orange is 1
-            ); true
+                (
+                    \+number(Player1Orange),
+                    checkLine(Board,ToVisit,[],Allied1,orange,0),
+                    Player1Orange is 1
+                ); 
+                (
+                    \+number(Player0Orange),
+                    (
+                        \+checkLine(Board,ToVisit,[],Allied1,orange,1),
+                        Player0Orange is 0
+                    )
+                );
+                true
+            )
         )
     ),
     (
@@ -141,24 +161,48 @@ checkOrange(Board,PlayerOrange, Player):-
         ); fail
     ).
     
+
 checkGreen(Board,PlayerGreen, Player):-
     ToVisit = [[7,7],[9,8],[11,9],[13,10],[15,11]] ,
+    write('1'),
     (
         (
+            allied(0,green,Allied0),
             (
-                allied(0,green,Allied0),
-                checkLine(Board,ToVisit,[],Allied0,green),
-                Player0Green is 0
-            );  true
+                (
+                    checkLine(Board,ToVisit,[],Allied0,green,0), 
+                    Player0Green is 0
+
+                );
+                (
+                    (
+                        \+checkLine(Board,ToVisit,[],Allied0,green,1),
+                        Player1Green is 1
+                    )
+                );  
+                true
+            )
         ),
         (
+            allied(1,green,Allied1),
             (
-                allied(1,green,Allied1),
-                checkLine(Board,ToVisit,[],Allied1,green),
-                Player1Green is 1
-            ); true
+                (
+                    \+number(Player1Green),
+                    checkLine(Board,ToVisit,[],Allied1,green,0),
+                    Player1Green is 1
+                ); 
+                (
+                    \+number(Player0Green),
+                    (
+                        \+checkLine(Board,ToVisit,[],Allied1,green,1),
+                        Player0Green is 0
+                    )
+                );
+                true
+            )
         )
     ),
+    write('3'),
     (
         (
             number(Player0Green), number(Player1Green),
@@ -178,43 +222,59 @@ checkPurple(Board,PlayerPurple, Player):-
     ToVisit = [[0,1],[1,2],[2,3],[3,4],[4,5]] ,
     (
         (
+            allied(0,purple,Allied0),
             (
-                allied(0,purple,Allied0),
-                checkLine(Board,ToVisit,[],Allied0,purple),
-                Player0Purple is 0
-            );  true
+                (
+                    checkLine(Board,ToVisit,[],Allied0,purple,0), 
+                    Player0Purple is 0
+                );
+                (
+                    (
+                        \+checkLine(Board,ToVisit,[],Allied0,purple,1),
+                        Player1Purple is 1
+                    )
+                );  
+                true
+            )
         ),
         (
+            allied(1,purple,Allied1),
             (
-                allied(1,purple,Allied1),
-                checkLine(Board,ToVisit,[],Allied1,purple),
-                Player1Purple is 1
-            ); true
+                (
+                    \+number(Player1Purple),
+                    checkLine(Board,ToVisit,[],Allied1,purple,0),
+                    Player1Purple is 1
+                ); 
+                (
+                    \+number(Player0Purple),
+                    (
+                        \+checkLine(Board,ToVisit,[],Allied1,purple,1),
+                        Player0Purple is 0
+                    )
+                );
+                true
+            )
         )
     ),
     (
         (
             number(Player0Purple), number(Player1Purple),
-            P is Player+1,
-            write('Player '), write(P),
             PlayerPurple is Player
         );
         (
             number(Player0Purple),
-            write('Player 1'),
             PlayerPurple is Player0Purple
         );
         (
             number(Player1Purple),
-            write('Player 2'),
             PlayerPurple is Player1Purple
         ); fail
     ).
 
 
-checkLine(_,[],_,_,_):- fail.
+checkLine(_,[],_,_,_,_):- fail.
 
-checkLine(Board,ToVisit,Visited,Allied,CheckingColor):-
+checkLine(Board,ToVisit,Visited,Allied,CheckingColor, Fencing):-
     [H|T] = ToVisit,
     (
         
@@ -226,18 +286,18 @@ checkLine(Board,ToVisit,Visited,Allied,CheckingColor):-
             diagonal_index_end(Row,D2),
             valid_diagonal(Diagonal,D1,D2),
             getValue(Board,Row,Diagonal,Row,Color),
-            (Color == CheckingColor; Color == Allied),
+            (Color == CheckingColor; Color == Allied; (Fencing == 1, Color == empty)),
             (
                 at_border(CheckingColor, Row, Diagonal);
                 (
                     getNeighbours(Row, Diagonal, Neighbours),
                     append(Neighbours,T,NewToVisit),
-                    checkLine(Board,NewToVisit,[H | Visited],Allied,CheckingColor)
+                    !,checkLine(Board,NewToVisit,[H | Visited],Allied,CheckingColor,Fencing)
                 )
             )
         );
         (
-            checkLine(Board,T,[H | Visited],Allied,CheckingColor)
+            !,checkLine(Board,T,[H | Visited],Allied,CheckingColor,Fencing)
         )
     ).
 
@@ -278,7 +338,7 @@ updateColorsWon(GameState,NewColorsWon, Player):-
 
 game_loop(GameState,Player,Winner):-
     [Board | ColorsWon] = GameState,
-    display_game(Board,Player),
+    display_game(GameState,Player),
     get_move(Move,Board),
     move(Board, Move, NewBoard),
     updateColorsWon([NewBoard | ColorsWon],NewColorsWon, Player),
