@@ -48,15 +48,6 @@ diagonal_index_end(20,12).
 diagonal_index_end(21,12).
 diagonal_index_end(22,12).
 
-valid_line(Line):-
-    number(Line),
-    Line >= 0,
-    Line =< 22.
-  
-valid_diagonal(Diagonal, D1, D2):-
-    number(Diagonal),
-    Diagonal >= D1,
-    Diagonal =< D2.
 
 valid_color(Color):-
     atom(Color),

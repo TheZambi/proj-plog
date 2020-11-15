@@ -2,27 +2,27 @@
 initial([
               [empty,empty],                           %even
             [empty,empty,empty],                       %odd
-          [empty,empty,empty,empty],                   %even
-        [empty,empty,empty,empty,empty],               %odd
-      [empty,empty,empty,empty,empty,empty],           %even
-        [empty,empty,empty,empty,empty],               %odd
-      [empty,empty,empty,orange,empty,empty],           %even
-    [empty,empty,empty,empty,empty,empty,empty],       %odd
-      [empty,empty,empty,empty,empty,empty],           %even
-    [empty,empty,empty,empty,empty,empty,empty],       %odd
-      [empty,empty,empty,empty,empty,empty],           %even
-    [empty,empty,empty,empty,empty,empty,empty],
+          [empty,empty,empty,purple],                   %even
+        [empty,empty,empty,purple,empty],               %odd
+      [empty,empty,empty,purple,empty,empty],           %even
+        [empty,empty,purple,empty,empty],               %odd
+      [empty,empty,purple,empty,empty,empty],           %even
+    [empty,empty,purple,empty,empty,empty,empty],       %odd
+      [empty,green,empty,empty,empty,empty],           %even
+    [green,green,empty,green,green,green,green],       %odd
+      [green,empty,green,green,green,green],           %even
+    [empty,empty,purple,empty,empty,empty,empty],
       [empty,green,empty,empty,empty,empty],
-    [empty,empty,empty,empty,empty,empty,empty],
-      [empty,empty,empty,empty,empty,empty],
     [empty,empty,purple,empty,empty,empty,empty],
       [empty,empty,empty,empty,empty,empty],
-        [empty,empty,empty,empty,empty],
-      [empty,empty,empty,empty,empty,empty],
-        [empty,empty,empty,empty,empty],
-          [empty,empty,empty,empty],
+    [empty,empty,purple,empty,empty,empty,empty],
+      [empty,empty,purple,empty,empty,empty],
+        [empty,purple,empty,empty,empty],
+      [empty,empty,purple,empty,empty,empty],
+        [empty,purple,empty,empty,empty],
+          [purple,empty,empty,empty],
             [empty,empty,empty],
-              [orange,orange]
+              [empty,empty]
 ]).
 
 cell_val(orange, 'O').
@@ -189,3 +189,6 @@ display_game(GameState,Player):-
     display_remaining_pieces,
     display_alliances.
 
+display_winner(Winner):-
+  WinningPlayer is Winner+1,
+  write('The winner is player '), write(WinningPlayer), write('!').
