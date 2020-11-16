@@ -383,5 +383,5 @@ play :-
     prompt(_,''),
     player(Player),
     initial(Board),
-    game_loop([Board,[-1,-1,-1],[0,42,42]],Player,Winner).
-    % display_winner(Winner).
+    game_loop([Board,[-1,-1,-1],[0,42,42]],Player,Winner),
+    display_winner(Winner).
