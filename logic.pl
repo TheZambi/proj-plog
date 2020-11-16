@@ -285,7 +285,7 @@ checkLine(Board,ToVisit,Visited,Allied,CheckingColor, Fencing):-
             diagonal_index_end(Row,D2),
             valid_diagonal(Diagonal,D1,D2),
             getValue(Board,Row,Diagonal,Row,Color),
-            (Color == CheckingColor; Color == Allied; (Fencing == 1, Color == empty)),
+            (Color == CheckingColor; Color == Allied; (Fencing =:= 1, Color == empty)),
             (
                 at_border(CheckingColor, Row, Diagonal);
                 (
@@ -307,7 +307,7 @@ updateColorsWon(GameState,NewColorsWon, Player):-
     [OrangeWon, PurpleWon, GreenWon | _ ] = ColorsWon,
     (
         (
-            (OrangeWon == -1),
+            (OrangeWon =:= -1),
             checkOrange(Board,PlayerOrange, Player)
         );
         (
@@ -316,7 +316,7 @@ updateColorsWon(GameState,NewColorsWon, Player):-
     ),
     (
         (
-            (PurpleWon == -1),
+            (PurpleWon =:= -1),
             checkPurple(Board, PlayerPurple, Player)
         );
         (
@@ -325,7 +325,7 @@ updateColorsWon(GameState,NewColorsWon, Player):-
     ),
     (
         (
-            (GreenWon == -1),
+            (GreenWon =:= -1),
             checkGreen(Board,PlayerGreen,Player)
         );
         (
@@ -383,5 +383,5 @@ play :-
     prompt(_,''),
     player(Player),
     initial(Board),
-    game_loop([Board,[-1,-1,-1],[0,42,42]],Player,Winner),
+    game_loop([Board,[-1,-1,-1],[42,42,42]],Player,Winner),
     display_winner(Winner).

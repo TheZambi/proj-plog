@@ -1,10 +1,10 @@
 
 initial([
-              [green,empty],                           %even
-            [green,empty,empty],                       %odd
-          [green,empty,empty,empty],                   %even
-        [green,empty,empty,empty,empty],               %odd
-      [green,empty,empty,empty,empty,empty],           %even
+              [empty,empty],                           %even
+            [empty,empty,empty],                       %odd
+          [empty,empty,empty,empty],                   %even
+        [empty,empty,empty,empty,empty],               %odd
+      [empty,empty,empty,empty,empty,empty],           %even
         [empty,empty,empty,empty,empty],               %odd
       [empty,empty,empty,empty,empty,empty],           %even
     [empty,empty,empty,empty,empty,empty,empty],       %odd
@@ -113,7 +113,7 @@ display_piece(H,Nrow,NPiece) :-
     [V | T] = H,
     (
       (
-        (NPiece == 0),
+        (NPiece =:= 0),
         start_value(Nrow,X),
         write(X)
       );
