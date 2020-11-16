@@ -49,12 +49,13 @@ diagonal_index_end(21,12).
 diagonal_index_end(22,12).
 
 
-valid_color(Color):-
+valid_color(Color,NPieces):-
+    [Orange, Purple, Green | _ ] = NPieces,
     atom(Color),
     (
-      Color == 'O';
-      Color == 'G';
-      Color == 'P'
+      (Color == 'O', (Orange > 0; (write('No Orange Pieces Left.'), nl,fail) ));
+      (Color == 'G', (Green > 0; (write('No Green Pieces Left.'), nl,fail) ));
+      (Color == 'P', (Purple > 0; (write('No Purple Pieces Left.'), nl,fail) ))
     ).
 
 get_line(Line):-
@@ -71,11 +72,11 @@ get_diagonal(Diagonal, Line):-
         read(Diagonal),
         valid_diagonal(Diagonal,D1,D2),!.
   
-get_color(Color):-
+get_color(Color,NPieces):-
     repeat,
         write('Insert move color (\'O\',\'P\',\'G\'): '),
         read(Aux),
-        valid_color(Aux),
+        valid_color(Aux,NPieces),
         (
           (
             Aux == 'O',
@@ -106,9 +107,9 @@ is_empty(Line,Diagonal,Board):-
       )
     ).
 
-get_move([Line,Diagonal,Color],Board):-
+get_move([Line,Diagonal,Color],Board, NPieces):-
     repeat,
         get_line(Line), 
         get_diagonal(Diagonal, Line),
         is_empty(Line,Diagonal,Board),!, 
-    get_color(Color).
+    get_color(Color,NPieces).

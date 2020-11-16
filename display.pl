@@ -1,19 +1,19 @@
 
 initial([
-              [empty,empty],                           %even
-            [empty,empty,empty],                       %odd
-          [empty,empty,empty,empty],                   %even
+              [green,empty],                           %even
+            [green,empty,empty],                       %odd
+          [green,empty,empty,empty],                   %even
+        [green,empty,empty,empty,empty],               %odd
+      [green,empty,empty,empty,empty,empty],           %even
         [empty,empty,empty,empty,empty],               %odd
       [empty,empty,empty,empty,empty,empty],           %even
-        [empty,empty,empty,empty,empty],               %odd
-      [orange,empty,empty,empty,empty,orange],           %even
-    [orange,orange,orange,orange,orange,empty,orange],       %odd
-      [empty,orange,orange,orange,orange,empty],           %even
-    [orange,empty,empty,empty,empty,empty,orange],       %odd
+    [empty,empty,empty,empty,empty,empty,empty],       %odd
       [empty,empty,empty,empty,empty,empty],           %even
-    [orange,empty,empty,empty,empty,empty,orange],
+    [empty,empty,empty,empty,empty,empty,empty],       %odd
+      [empty,empty,empty,empty,empty,empty],           %even
+    [empty,empty,empty,empty,empty,empty,empty],
       [empty,empty,empty,empty,empty,empty],
-    [orange,empty,empty,empty,empty,empty,orange],
+    [empty,empty,empty,empty,empty,empty,empty],
       [empty,empty,empty,empty,empty,empty],
     [empty,empty,empty,empty,empty,empty,empty],
       [empty,empty,empty,empty,empty,empty],
@@ -172,10 +172,11 @@ display_player(Player):-
     P is Player+1,
     write('Current Player: ') , write(P), nl.
 
-display_remaining_pieces :-
-    write('Current Orange Pieces Left: 42'), nl,
-    write('Current Purple Pieces Left: 42'), nl,
-    write('Current Green Pieces Left: 42'), nl.
+display_remaining_pieces(NPieces) :-
+    [Orange,Purple,Green|_] = NPieces,
+    write('Current Orange Pieces Left: '), write(Orange), nl,
+    write('Current Purple Pieces Left: '), write(Purple), nl,
+    write('Current Green Pieces Left: '), write(Green), nl.
 
 display_alliances:-
     write('Player 1 alliances: To connect Orange: Orange-Green, to connect Green: Green-Purple, to connect Purple: Purple-Orange'), nl,
@@ -208,12 +209,12 @@ display_colors([Orange, Purple, Green | _]):-
     ).
 
 display_game(GameState,Player):-
-    [Board , Colors | _] = GameState,
+    [Board , Colors, NPieces | _] = GameState,
     close_hex_top,
     display_board(Board,Player,0),
     close_hex_bot,
     display_player(Player),
-    display_remaining_pieces,
+    display_remaining_pieces(NPieces),
     display_colors(Colors),
     display_alliances.
 

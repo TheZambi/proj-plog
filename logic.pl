@@ -1,5 +1,6 @@
 :- include('display.pl').
 :- include('input.pl').
+:- include('bot.pl').
 
 :- use_module(library(aggregate)).
 
@@ -164,7 +165,6 @@ checkOrange(Board,PlayerOrange, Player):-
 
 checkGreen(Board,PlayerGreen, Player):-
     ToVisit = [[7,7],[9,8],[11,9],[13,10],[15,11]] ,
-    write('1'),
     (
         (
             allied(0,green,Allied0),
@@ -202,7 +202,6 @@ checkGreen(Board,PlayerGreen, Player):-
             )
         )
     ),
-    write('3'),
     (
         (
             number(Player0Green), number(Player1Green),
@@ -335,13 +334,38 @@ updateColorsWon(GameState,NewColorsWon, Player):-
     ),
     NewColorsWon = [PlayerOrange, PlayerPurple, PlayerGreen].
 
+updateNPieces(Move,NPieces,NewNPieces):-
+    [_,_,Color|_] = Move,
+    [OrangePieces, PurplePieces, GreenPieces | _] = NPieces,
+    (
+        (
+            (Color == orange),
+            O is OrangePieces-1,
+            NewNPieces = [O,PurplePieces,GreenPieces]
+        );
+        (
+            (Color == purple),
+            P is PurplePieces-1,
+            NewNPieces = [OrangePieces,P,GreenPieces]
+        );
+        (
+            (Color == green),
+            G is GreenPieces-1,
+            NewNPieces = [OrangePieces,PurplePieces,G]
+        )
+    ).
+
 
 game_loop(GameState,Player,Winner):-
-    [Board | ColorsWon] = GameState,
+    [Board | T] = GameState,
+    [ColorsWon , NPieces | _] = T,
     display_game(GameState,Player),
-    get_move(Move,Board),
+    get_move(Move,Board, NPieces),
+    updateNPieces(Move,NPieces,NewNPieces),
     move(Board, Move, NewBoard),
-    updateColorsWon([NewBoard | ColorsWon],NewColorsWon, Player),
+    updateColorsWon([NewBoard, ColorsWon],NewColorsWon, Player),
+    value([NewBoard,NewColorsWon],Value),
+    write(Value),
     !,
     game_over(Winner,NewColorsWon),
     update_player(Player, NewPlayer),
@@ -350,7 +374,7 @@ game_loop(GameState,Player,Winner):-
             number(Winner)  % in case there is a winner already the game loop is finished
         );
         (
-            game_loop([NewBoard,NewColorsWon],NewPlayer,Winner)
+            game_loop([NewBoard,NewColorsWon,NewNPieces],NewPlayer,Winner)
         )
     ).
       
@@ -359,5 +383,5 @@ play :-
     prompt(_,''),
     player(Player),
     initial(Board),
-    game_loop([Board,[-1,-1,-1]],Player,Winner),
-    display_winner(Winner).
+    game_loop([Board,[-1,-1,-1],[0,42,42]],Player,Winner).
+    % display_winner(Winner).
