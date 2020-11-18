@@ -16,7 +16,12 @@ iterateRow(Row,CurrentRow,CurrentDiagonal,NPieces,ListOfMoves,FinalListOfMoves):
     [Value | T ] = Row,
     [Orange, Purple, Green] = NPieces,
     (
-        Value \== empty; 
+        (
+            Value \== empty,
+            AuxOrange = [],
+            AuxPurple = [],
+            AuxGreen = []
+        );
         (
             addOrangeMove(CurrentRow,CurrentDiagonal,Orange,AuxOrange),
             addPurpleMove(CurrentRow,CurrentDiagonal,Purple,AuxPurple),
@@ -68,7 +73,9 @@ iterateBoard(Board,NPieces,CurrentRow,ListOfMoves,FinalListOfMoves):-
 
 valid_moves(GameState, Player,FinalListOfMoves):-
     [Board, _ , NPieces] = GameState,
-    iterateBoard(Board,NPieces,0,AuxListOfMoves, FinalListOfMoves).
+    iterateBoard(Board,NPieces,0,AuxListOfMoves, AuxFinalListOfMoves),
+    remove_dups(AuxFinalListOfMoves, NoDuplicateListOfMoves),
+    delete(NoDuplicateListOfMoves,[], FinalListOfMoves).
 
 
 getOrangePathLength(Board,Length):-
