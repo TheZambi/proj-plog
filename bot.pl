@@ -64,7 +64,7 @@ iterateBoard(Board,NPieces,CurrentRow,ListOfMoves,FinalListOfMoves):-
     NewRow is CurrentRow+1,
     iterateBoard(T,NPieces,NewRow,RowListOfMoves,FinalListOfMoves).
 
-valid_moves(GameState, Player, AuxListOfMoves,FinalListOfMoves):-
+valid_moves(GameState, Player,FinalListOfMoves):-
     [Board, _ , NPieces] = GameState,
     iterateBoard(Board,NPieces,0,AuxListOfMoves, FinalListOfMoves).
     

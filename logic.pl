@@ -363,7 +363,7 @@ game_loop(GameState,Player,Winner):-
     [Board | T] = GameState,
     [ColorsWon , NPieces | _] = T,
     display_game(GameState,Player),
-    valid_moves(GameState,Player,AuxListOfMoves,FinalListOfMoves),
+    valid_moves(GameState,Player, ListOfMoves),
 
     get_move(Move,Board, NPieces),
     updateNPieces(Move,NPieces,NewNPieces),
