@@ -72,13 +72,16 @@ getRow([H|T],RowNumber,[H|NewBoard],Move):-
     NewRowNumber is RowNumber-1,
     getRow(T,NewRowNumber,NewBoard,Move).
 
-move(Board, Move, NewBoard):-
+move(GameState, Move, NewGameState):-
+    [Board | T ] = GameState,
     [RowNumber|_] = Move,
-    getRow(Board,RowNumber,NewBoard,Move).
+    getRow(Board,RowNumber,NewBoard,Move),
+    NewGameState = [NewBoard|T].
 
 count_occurrences(List, X, Count) :- aggregate_all(count, member(X, List), Count).
 
-game_over(Winner,ColorsWon):-
+game_over(GameState, Winner):-
+    [ _ , ColorsWon | _ ] = GameState, 
     count_occurrences(ColorsWon,0,CountOfZero),
     count_occurrences(ColorsWon,1,CountOfOne),
     (CountOfZero < 2 ; Winner is 0),
@@ -360,17 +363,20 @@ game_loop(GameState,Player,Winner):-
     [Board | T] = GameState,
     [ColorsWon , NPieces | _] = T,
     display_game(GameState,Player),
+    valid_moves(GameState,Player,AuxListOfMoves,FinalListOfMoves),
+
     get_move(Move,Board, NPieces),
     updateNPieces(Move,NPieces,NewNPieces),
-    move(Board, Move, NewBoard),
-    updateColorsWon([NewBoard, ColorsWon],NewColorsWon, Player),
-    value([NewBoard,NewColorsWon],Value),
+    move(GameState, Move, NewGameState),
+    [NewBoard | _] = NewGameState,
+    updateColorsWon([NewBoard, ColorsWon], NewColorsWon, Player),
+    value([NewBoard,NewColorsWon], Player, Value),
     write(Value),
     !,
-    game_over(Winner,NewColorsWon),
+    game_over([NewBoard,NewColorsWon,NewNPieces],Winner),
     update_player(Player, NewPlayer),
     (
-        (
+       (
             number(Winner)  % in case there is a winner already the game loop is finished
         );
         (
@@ -385,3 +391,4 @@ play :-
     initial(Board),
     game_loop([Board,[-1,-1,-1],[42,42,42]],Player,Winner),
     display_winner(Winner).
+
