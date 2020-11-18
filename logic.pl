@@ -363,32 +363,31 @@ game_loop(GameState,Player,Winner):-
     [Board | T] = GameState,
     [ColorsWon , NPieces | _] = T,
     display_game(GameState,Player),
-    valid_moves(GameState,Player, ListOfMoves),
-
-    get_move(Move,Board, NPieces),
-    updateNPieces(Move,NPieces,NewNPieces),
-    move(GameState, Move, NewGameState),
-    [NewBoard | _] = NewGameState,
+    % valid_moves(GameState,Player, ListOfMoves),
+    % get_move(Move,Board, NPieces),
+    % updateNPieces(Move,NPieces,NewNPieces),
+    % move(GameState, Move, NewGameState),
+    % [NewBoard | _] = NewGameState,
     updateColorsWon([NewBoard, ColorsWon], NewColorsWon, Player),
-    value([NewBoard,NewColorsWon], Player, Value),
-    write(Value),
-    !,
-    game_over([NewBoard,NewColorsWon,NewNPieces],Winner),
-    update_player(Player, NewPlayer),
-    (
-       (
-            number(Winner)  % in case there is a winner already the game loop is finished
-        );
-        (
-            game_loop([NewBoard,NewColorsWon,NewNPieces],NewPlayer,Winner)
-        )
-    ).
+    % value([NewBoard,NewColorsWon], Player, Value).
+    value([Board,NewColorsWon], Player, Value). % REMOVE THIS LATER
+    % !,
+    % game_over([NewBoard,NewColorsWon,NewNPieces],Winner),
+    % update_player(Player, NewPlayer),
+    % (
+    %    (
+    %         number(Winner)  % in case there is a winner already the game loop is finished
+    %     );
+    %     (
+    %         game_loop([NewBoard,NewColorsWon,NewNPieces],NewPlayer,Winner)
+    %     )
+    % ).
       
 
 play :-
     prompt(_,''),
     player(Player),
     initial(Board),
-    game_loop([Board,[-1,-1,-1],[42,42,42]],Player,Winner),
-    display_winner(Winner).
+    game_loop([Board,[-1,-1,-1],[42,42,42]],Player,Winner).
+    % display_winner(Winner).
 
