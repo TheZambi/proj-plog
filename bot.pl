@@ -1,8 +1,10 @@
 value(GameState, Player, Value):-
     [Board, ColorsWon | _] = GameState,
     captured_color_value(ColorsWon, ColorValue),
-    getPathValue(Board,PathValue),
-    Value is ColorValue + PathValue.
+    getPathValue(Player,Board,PathValue),
+    NewP is mod(Player+1,2),
+    getPathValue(NewP,Board,Player2PathValue),
+    Value is ColorValue + PathValue - Player2PathValue.
 
 captured_color_value(ColorsWon,ColorValue):-
     count_occurrences(ColorsWon,0,CountOfZero),
@@ -76,28 +78,29 @@ valid_moves(GameState, Player,FinalListOfMoves):-
     remove_dups(AuxFinalListOfMoves, NoDuplicateListOfMoves),
     delete(NoDuplicateListOfMoves,[], FinalListOfMoves).
 
-getPathValue(Board,PathValue):-
-    getOrangePathLength(Board,Length),
-    getPurplePathLength(Board,Length1),
-    getGreenPathLength(Board,Length2),
+getPathValue(Player,Board,PathValue):-
+    trace,
+    getOrangePathLength(Player,Board,Length),
+    getPurplePathLength(Player,Board,Length1),
+    getGreenPathLength(Player,Board,Length2),
     AuxValue is (5-Length)*4,
     AuxValue1 is (5-Length1)*4,
     AuxValue2 is (5-Length2)*4,
     PathValue is AuxValue + AuxValue1 + AuxValue2.
  
-getOrangePathLength(Board,Length):-
+getOrangePathLength(Player,Board,Length):-
     ToVisit = [[0,0],[1,0],[2,0],[3,0],[4,0]],
-    allied(0,orange,Allied),
+    allied(Player,orange,Allied),
     getPathLengthWrapper(Board,ToVisit,[],Allied,orange,1,Length).
 
-getPurplePathLength(Board,Length):-
+getPurplePathLength(Player,Board,Length):-
     ToVisit = [[0,1],[1,2],[2,3],[3,4],[4,5]],
-    allied(0,purple,Allied),
+    allied(Player,purple,Allied),
     getPathLengthWrapper(Board,ToVisit,[],Allied,purple,1,Length).
 
-getGreenPathLength(Board,Length):-
+getGreenPathLength(Player,Board,Length):-
     ToVisit = [[7,7],[9,8],[11,9],[13,10],[15,11]],
-    allied(0,green,Allied),
+    allied(Player,green,Allied),
     getPathLengthWrapper(Board,ToVisit,[],Allied,green,1,Length).
     
 getPathLengthWrapper(Board,ToVisit,[],Allied,Color,Depth,Length):-
