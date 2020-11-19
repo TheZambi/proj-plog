@@ -1,16 +1,17 @@
 value(GameState, Player, Value):-
     [Board, ColorsWon | _] = GameState,
-    captured_color_value(ColorsWon, ColorValue),
-    getPathValue(Player,Board,PathValue),
+    captured_color_value(Player, ColorsWon, ColorValue),
+    getPathValue(Player,ColorsWon,Board,PathValue),
     NewP is mod(Player+1,2),
-    getPathValue(NewP,Board,Player2PathValue),
+    getPathValue(NewP,ColorsWon,Board,Player2PathValue),
     Value is ColorValue + PathValue - Player2PathValue.
 
-captured_color_value(ColorsWon,ColorValue):-
-    count_occurrences(ColorsWon,0,CountOfZero),
-    count_occurrences(ColorsWon,1,CountOfOne),
-    AuxValue is 0 + CountOfZero * 50,
-    ColorValue is AuxValue - (CountOfOne * 50).
+captured_color_value(Player, ColorsWon,ColorValue):-
+    count_occurrences(ColorsWon,Player,CountOfPlayer),
+    NewP is mod(Player+1,2),
+    count_occurrences(ColorsWon,NewP,CountOfOpponent),
+    AuxValue is 0 + CountOfPlayer * 50,
+    ColorValue is AuxValue - (CountOfOpponent * 50).
 
 iterateRow([],_,_,_,NewListOfMoves,NewListOfMoves).
 iterateRow(Row,CurrentRow,CurrentDiagonal,NPieces,ListOfMoves,FinalListOfMoves):-
@@ -78,14 +79,24 @@ valid_moves(GameState, Player,FinalListOfMoves):-
     remove_dups(AuxFinalListOfMoves, NoDuplicateListOfMoves),
     delete(NoDuplicateListOfMoves,[], FinalListOfMoves).
 
-getPathValue(Player,Board,PathValue):-
-    trace,
-    getOrangePathLength(Player,Board,Length),
-    getPurplePathLength(Player,Board,Length1),
-    getGreenPathLength(Player,Board,Length2),
+getPathValue(Player,ColorsWon,Board,PathValue):-
+    [Orange,Purple,Green] = ColorsWon,
+    (
+        (Orange \== -1, Length is 5) ; 
+        getOrangePathLength(Player,Board,Length)
+    ),
+    (
+        (Purple \==  -1, Length1 is 5);
+        getPurplePathLength(Player,Board,Length1)
+    ),
+    (
+        (Green \==  -1, Length2 is 5); 
+        getGreenPathLength(Player,Board,Length2)
+    ),
     AuxValue is (5-Length)*4,
     AuxValue1 is (5-Length1)*4,
     AuxValue2 is (5-Length2)*4,
+    write(AuxValue),write(AuxValue1),write(AuxValue2),
     PathValue is AuxValue + AuxValue1 + AuxValue2.
  
 getOrangePathLength(Player,Board,Length):-
@@ -93,13 +104,14 @@ getOrangePathLength(Player,Board,Length):-
     allied(Player,orange,Allied),
     getPathLengthWrapper(Board,ToVisit,[],Allied,orange,1,Length).
 
+
 getPurplePathLength(Player,Board,Length):-
-    ToVisit = [[0,1],[1,2],[2,3],[3,4],[4,5]],
+    ToVisit = [[18,7],[19,8],[20,9],[21,10],[22,11]],
     allied(Player,purple,Allied),
     getPathLengthWrapper(Board,ToVisit,[],Allied,purple,1,Length).
 
 getGreenPathLength(Player,Board,Length):-
-    ToVisit = [[7,7],[9,8],[11,9],[13,10],[15,11]],
+    ToVisit = [[7,1],[9,2],[11,3],[13,4],[15,5]] ,
     allied(Player,green,Allied),
     getPathLengthWrapper(Board,ToVisit,[],Allied,green,1,Length).
     

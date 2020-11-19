@@ -24,17 +24,17 @@ at_border(orange, 20, 12).
 at_border(orange, 21, 12).
 at_border(orange, 22, 12).
 
-at_border(purple, 18, 7).
-at_border(purple, 19, 8).
-at_border(purple, 20, 9).
-at_border(purple, 21, 10).
-at_border(purple, 22, 11).
+at_border(purple, 0, 1).
+at_border(purple, 1, 2).
+at_border(purple, 2, 3).
+at_border(purple, 3, 4).
+at_border(purple, 4, 5).
 
-at_border(green, 7, 1).
-at_border(green, 9, 2).
-at_border(green, 11, 3).
-at_border(green, 13, 4).
-at_border(green, 15, 5).
+at_border(green, 7, 7).
+at_border(green, 9, 8).
+at_border(green, 11, 9).
+at_border(green, 13, 10).
+at_border(green, 15, 11).
 
 
 update_player(Player, NewPlayer):-
@@ -109,7 +109,7 @@ getNeighbours(Row,Diagonal,Neighbours):-
     NextNextRow is Row+2,
     LastDiagonal is Diagonal-1,
     NextDiagonal is Diagonal+1,
-    Neighbours = [[LastRow,LastDiagonal],[LastLastRow,LastDiagonal],[LastRow,Diagonal],[NextRow,Diagonal],[NextRow,NextDiagonal],[NextNextRow,NextDiagonal]].
+    Neighbours = [[LastRow,Diagonal],[NextRow,NextDiagonal],[LastLastRow,LastDiagonal],[NextNextRow,NextDiagonal],[LastRow,LastDiagonal],[NextRow,Diagonal]].
     
 
 checkOrange(Board,PlayerOrange, Player):-
@@ -167,7 +167,7 @@ checkOrange(Board,PlayerOrange, Player):-
     
 
 checkGreen(Board,PlayerGreen, Player):-
-    ToVisit = [[7,7],[9,8],[11,9],[13,10],[15,11]] ,
+    ToVisit = [[7,1],[9,2],[11,3],[13,4],[15,5]] ,
     (
         (
             allied(0,green,Allied0),
@@ -221,7 +221,7 @@ checkGreen(Board,PlayerGreen, Player):-
     ).
 
 checkPurple(Board,PlayerPurple, Player):-
-    ToVisit = [[0,1],[1,2],[2,3],[3,4],[4,5]] ,
+    ToVisit = [[18,7],[19,8],[20,9],[21,10],[22,11]],
     (
         (
             allied(0,purple,Allied0),
@@ -370,7 +370,7 @@ game_loop(GameState,Player,Winner):-
     [NewBoard | _] = NewGameState,
     updateColorsWon([NewBoard, ColorsWon], NewColorsWon, Player),
     value([NewBoard,NewColorsWon], Player, Value),
-    write('Current board value for player 1: '),
+    write('Current board value for current player: '),
     write(Value),
     !,
     game_over([NewBoard,NewColorsWon,NewNPieces],Winner),
