@@ -73,9 +73,9 @@ iterateBoard(Board,NPieces,CurrentRow,ListOfMoves,FinalListOfMoves):-
     NewRow is CurrentRow+1,
     iterateBoard(T,NPieces,NewRow,RowListOfMoves,FinalListOfMoves).
 
-valid_moves(GameState, Player,FinalListOfMoves):-
+valid_moves(GameState, _,FinalListOfMoves):-
     [Board, _ , NPieces] = GameState,
-    iterateBoard(Board,NPieces,0,AuxListOfMoves, AuxFinalListOfMoves),
+    iterateBoard(Board,NPieces,0,_, AuxFinalListOfMoves),
     remove_dups(AuxFinalListOfMoves, NoDuplicateListOfMoves),
     delete(NoDuplicateListOfMoves,[], FinalListOfMoves).
 
@@ -181,3 +181,16 @@ getPathLength(Board,ToVisit,Visited,Allied,CheckingColor,Depth):-
         )
     ).
 
+
+get_random_move([Move|_],0,Move).
+get_random_move(ListOfMoves,RandomMove,Move):-
+    NewRandomMove is RandomMove-1,
+    [_ | T] = ListOfMoves,
+    get_random_move(T, NewRandomMove, Move).
+
+choose_move(GameState,Player,1,Move):- 
+    valid_moves(GameState,Player, ListOfMoves),
+    length(ListOfMoves,Length),
+    UpperBound is Length+1,
+    random(0,UpperBound,RandomMove),
+    get_random_move(ListOfMoves,RandomMove,Move).

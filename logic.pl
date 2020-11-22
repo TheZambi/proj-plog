@@ -2,7 +2,9 @@
 :- include('input.pl').
 :- include('bot.pl').
 
+:- use_module(library(random)).
 :- use_module(library(aggregate)).
+:- use_module(library(system)).
 
 :- dynamic player/1.
 
@@ -359,11 +361,10 @@ updateNPieces(Move,NPieces,NewNPieces):-
     ).
 
 
-game_loop(GameState,Player,Winner):-
+game_loop(GameState,Player,Winner,0,_):-  %PvP  (0)
     [Board | T] = GameState,
     [ColorsWon , NPieces | _] = T,
     display_game(GameState,Player),
-    valid_moves(GameState,Player, ListOfMoves),
     get_move(Move,Board, NPieces),
     updateNPieces(Move,NPieces,NewNPieces),
     move(GameState, Move, NewGameState),
@@ -383,12 +384,43 @@ game_loop(GameState,Player,Winner):-
             game_loop([NewBoard,NewColorsWon,NewNPieces],NewPlayer,Winner)
         )
     ).
+
+
       
+game_loop(GameState,Player,Winner,1,Level):- %PvAI  (1)
+    [Board | T] = GameState,
+    [ColorsWon , NPieces | _] = T,
+    display_game(GameState,Player),
+    (
+        (
+            Player =:= 0,
+            get_move(Move,Board, NPieces)
+        );
+        (
+            choose_move(GameState,Player,Level,Move)
+        )
+    ),
+    updateNPieces(Move,NPieces,NewNPieces),
+    move(GameState, Move, NewGameState),
+        
+    [NewBoard | _] = NewGameState,
+    updateColorsWon([NewBoard, ColorsWon], NewColorsWon, Player),
+    !,
+    game_over([NewBoard,NewColorsWon,NewNPieces],Winner),
+    update_player(Player, NewPlayer),
+    (
+       (
+            number(Winner)  % in case there is a winner already the game loop is finished
+        );
+        (
+            game_loop([NewBoard,NewColorsWon,NewNPieces],NewPlayer,Winner,1,1)
+        )
+    ).
 
 play :-
     prompt(_,''),
     player(Player),
     initial(Board),
-    game_loop([Board,[-1,-1,-1],[42,42,42]],Player,Winner).
-    % display_winner(Winner).
+    game_loop([Board,[-1,-1,-1],[42,42,42]],Player,Winner,1,1),
+    display_winner(Winner).
 
