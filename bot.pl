@@ -191,6 +191,5 @@ get_random_move(ListOfMoves,RandomMove,Move):-
 choose_move(GameState,Player,1,Move):- 
     valid_moves(GameState,Player, ListOfMoves),
     length(ListOfMoves,Length),
-    UpperBound is Length+1,
-    random(0,UpperBound,RandomMove),
+    random(0,Length,RandomMove),
     get_random_move(ListOfMoves,RandomMove,Move).
