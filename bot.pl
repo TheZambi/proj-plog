@@ -73,7 +73,7 @@ iterateBoard(Board,NPieces,CurrentRow,ListOfMoves,FinalListOfMoves):-
     NewRow is CurrentRow+1,
     iterateBoard(T,NPieces,NewRow,RowListOfMoves,FinalListOfMoves).
 
-valid_moves(GameState, Player ,FinalListOfMoves):-
+valid_moves(GameState, _Player ,FinalListOfMoves):-
     [Board, _ , NPieces] = GameState,
     iterateBoard(Board,NPieces,0,_ , AuxFinalListOfMoves),
     remove_dups(AuxFinalListOfMoves, NoDuplicateListOfMoves),
@@ -96,7 +96,6 @@ getPathValue(Player,ColorsWon,Board,PathValue):-
     AuxValue is (5-Length)*4,
     AuxValue1 is (5-Length1)*4,
     AuxValue2 is (5-Length2)*4,
-    write(AuxValue),write(AuxValue1),write(AuxValue2),
     PathValue is AuxValue + AuxValue1 + AuxValue2.
  
 getOrangePathLength(Player,Board,Length):-
@@ -193,3 +192,26 @@ choose_move(GameState,Player,1,Move):-
     length(ListOfMoves,Length),
     random(0,Length,RandomMove),
     get_random_move(ListOfMoves,RandomMove,Move), sleep(1).
+
+choose_move(GameState,Player,2,Move):- 
+    valid_moves(GameState,Player, ListOfMoves),
+    simMoves(GameState,ListOfMoves,Player,_BestMove,-10000, Move),
+    [Row,Diagonal,Color] = Move, nl,
+    write('Putting piece of color '), write(Color), write(' at row '), write(Row), write(' and diagonal '), write(Diagonal).
+
+simMoves(_,[],_, BestMove,_, BestMove).
+simMoves(GameState,ListOfMoves,Player, BestMove,BestMoveValue, FinalBestMove):-
+    [_, ColorsWon, NPieces] = GameState,
+    [Move | T] = ListOfMoves,
+    updateNPieces(Move,NPieces,_),
+    move(GameState, Move, NewGameState),    
+    [NewBoard | _] = NewGameState,
+    updateColorsWon([NewBoard, ColorsWon], NewColorsWon, Player),
+    value([NewBoard,NewColorsWon], Player, Value),
+    (
+        (
+        Value > BestMoveValue,
+        simMoves(GameState,T,Player,Move,Value,FinalBestMove)
+        ); simMoves(GameState,T,Player,BestMove,BestMoveValue,FinalBestMove)
+    ).
+    

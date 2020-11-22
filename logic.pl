@@ -398,8 +398,7 @@ game_loop(GameState,Player,Winner,1,Level):- %PvAI  (1)
         )
     ),
     updateNPieces(Move,NPieces,NewNPieces),
-    move(GameState, Move, NewGameState),
-        
+    move(GameState, Move, NewGameState),    
     [NewBoard | _] = NewGameState,
     updateColorsWon([NewBoard, ColorsWon], NewColorsWon, Player),
     !,
@@ -410,7 +409,7 @@ game_loop(GameState,Player,Winner,1,Level):- %PvAI  (1)
             number(Winner)  % in case there is a winner already the game loop is finished
         );
         (
-            game_loop([NewBoard,NewColorsWon,NewNPieces],NewPlayer,Winner,1,1)
+            game_loop([NewBoard,NewColorsWon,NewNPieces],NewPlayer,Winner,1,Level)
         )
     ).
 
@@ -418,6 +417,6 @@ play :-
     prompt(_,''),
     player(Player),
     initial(Board),
-    game_loop([Board,[-1,-1,-1],[42,42,42]],Player,Winner,1,1),
+    game_loop([Board,[-1,-1,-1],[42,42,42]],Player,Winner,1,2),
     display_winner(Winner).
 
