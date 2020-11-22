@@ -97,6 +97,7 @@ getPathValue(Player,ColorsWon,Board,PathValue):-
     AuxValue1 is (5-Length1)*4,
     AuxValue2 is (5-Length2)*4,
     PathValue is AuxValue + AuxValue1 + AuxValue2.
+    %write(PathValue).
  
 getOrangePathLength(Player,Board,Length):-
     ToVisit = [[0,0],[1,0],[2,0],[3,0],[4,0]],
@@ -120,23 +121,41 @@ getPathLengthWrapper(Board,ToVisit,[],Allied,Color,Depth,Length):-
         Length is Depth
     );
     (
-        getPathLength(Board,ToVisit,[],Allied,Color,Depth),
+        getPathLength(Board,ToVisit,[],_,Allied,Color,Depth,ReturnVal),
+        ReturnVal,
+        write('Returned true:'),
+        write(Depth),
         Length is Depth
     );
     (
         NewDepth is Depth+1,
-        getPathLengthWrapper(Board,ToVisit,[],Allied,Color,NewDepth,Length)
+        !,getPathLengthWrapper(Board,ToVisit,[],Allied,Color,NewDepth,Length)
     ).
 
-getPathLength(_,[],_,_,_,_):- fail.
-getPathLength(Board,ToVisit,Visited,Allied,CheckingColor,Depth):-
-    Depth > 0,
+memberWithDepth([Row,Diag,Depth],[[Row,Diag,Depth2]|_]):-Depth=<Depth2.
+memberWithDepth(X,[_|T]) :- memberWithDepth(X,T).
+
+getPathLength(_,[],Visited,Visited,_,_,_,false).
+getPathLength(_,_,Visited,Visited,_,_,-1,false).
+getPathLength(Board,ToVisit,Visited,NewVisited,Allied,CheckingColor,Depth,ReturnVal):-
+    
+    ((CheckingColor == orange,write(ToVisit), nl);true),
+    
+    (
+        (member([18,12],ToVisit),write([18,12]));
+        (member([19,12],ToVisit),write([19,12]));
+        (member([20,12],ToVisit),write([18,12]));
+        (member([21,12],ToVisit),write([18,12]));
+        (member([22,12],ToVisit),write([18,12]));
+        true
+    ),
+    %trace,
     [H|T] = ToVisit,
     (
         
         (
-            \+member(H,Visited),
             [Row,Diagonal | _ ] = H,
+            \+memberWithDepth([Row,Diagonal,Depth],Visited),
             valid_line(Row),
             diagonal_index(Row,D1),
             diagonal_index_end(Row,D2),
@@ -146,13 +165,16 @@ getPathLength(Board,ToVisit,Visited,Allied,CheckingColor,Depth):-
                 (
                     (Color == CheckingColor; Color == Allied),
                     (
-                        at_border(CheckingColor, Row, Diagonal);
+                        (at_border(CheckingColor, Row, Diagonal), ReturnVal = true,write('At border'));
                         (
                             getNeighbours(Row, Diagonal, Neighbours),
                             !,
                             (
-                                getPathLength(Board,Neighbours,[H | Visited],Allied,CheckingColor,Depth);
-                                getPathLength(Board,T,[H | Visited],Allied,CheckingColor,Depth)
+                                getPathLength(Board,Neighbours,[[Row,Diagonal,Depth] | Visited],NewVisited,Allied,CheckingColor,Depth,NewReturnVal),
+                                (
+                                    (NewReturnVal, ReturnVal = true); 
+                                    !,(getPathLength(Board,T,[[Row,Diagonal,Depth] | NewVisited],_,Allied,CheckingColor,Depth, ReturnVal), ReturnVal)
+                                )
                             )
                         )
                     )
@@ -160,23 +182,26 @@ getPathLength(Board,ToVisit,Visited,Allied,CheckingColor,Depth):-
                 (
                     Color == empty,
                     (
-                        at_border(CheckingColor, Row, Diagonal);
+                        (at_border(CheckingColor, Row, Diagonal), ReturnVal = true,write('At border'));
                         (
                             getNeighbours(Row, Diagonal, Neighbours),
                             AuxDepth is Depth-1,
                             !,
                             (
-                                getPathLength(Board,Neighbours,[H | Visited],Allied,CheckingColor,AuxDepth);
-                                getPathLength(Board,T,[H | Visited],Allied,CheckingColor,Depth)
+                                getPathLength(Board,Neighbours,[[Row,Diagonal,Depth] | Visited],NewVisited,Allied,CheckingColor,AuxDepth,NewReturnVal),
+                                (
+                                    (NewReturnVal, ReturnVal = true); 
+                                    !,(getPathLength(Board,T,[[Row,Diagonal,Depth] | NewVisited],_,Allied,CheckingColor,Depth, ReturnVal),ReturnVal)
+                                )
                             )
                         )
                     )
                 )
             )
-            
         );
         (
-            !,getPathLength(Board,T,[H | Visited],Allied,CheckingColor,Depth)
+            [Row,Diagonal | _ ] = H,
+            !,getPathLength(Board,T,[[Row,Diagonal,Depth] | Visited],_,Allied,CheckingColor,Depth,ReturnVal), NewVisited = Visited
         )
     ).
 
@@ -214,4 +239,5 @@ simMoves(GameState,ListOfMoves,Player, BestMove,BestMoveValue, FinalBestMove):-
         simMoves(GameState,T,Player,Move,Value,FinalBestMove)
         ); simMoves(GameState,T,Player,BestMove,BestMoveValue,FinalBestMove)
     ).
+    
     
