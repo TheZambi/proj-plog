@@ -73,9 +73,9 @@ iterateBoard(Board,NPieces,CurrentRow,ListOfMoves,FinalListOfMoves):-
     NewRow is CurrentRow+1,
     iterateBoard(T,NPieces,NewRow,RowListOfMoves,FinalListOfMoves).
 
-valid_moves(GameState, _,FinalListOfMoves):-
+valid_moves(GameState, Player ,FinalListOfMoves):-
     [Board, _ , NPieces] = GameState,
-    iterateBoard(Board,NPieces,0,_, AuxFinalListOfMoves),
+    iterateBoard(Board,NPieces,0,_ , AuxFinalListOfMoves),
     remove_dups(AuxFinalListOfMoves, NoDuplicateListOfMoves),
     delete(NoDuplicateListOfMoves,[], FinalListOfMoves).
 
