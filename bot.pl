@@ -192,4 +192,4 @@ choose_move(GameState,Player,1,Move):-
     valid_moves(GameState,Player, ListOfMoves),
     length(ListOfMoves,Length),
     random(0,Length,RandomMove),
-    get_random_move(ListOfMoves,RandomMove,Move).
+    get_random_move(ListOfMoves,RandomMove,Move), sleep(1).
