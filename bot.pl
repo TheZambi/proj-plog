@@ -82,20 +82,20 @@ valid_moves(GameState, _Player ,FinalListOfMoves):-
 getPathValue(Player,ColorsWon,Board,PathValue):-
     [Orange,Purple,Green] = ColorsWon,
     (
-        (Orange \== -1, Length is 5) ; 
+        (Orange \== -1, Length is 2) ; 
         getOrangePathLength(Player,Board,Length)
     ),
     (
-        (Purple \==  -1, Length1 is 5);
+        (Purple \==  -1, Length1 is 2);
         getPurplePathLength(Player,Board,Length1)
     ),
     (
-        (Green \==  -1, Length2 is 5); 
+        (Green \==  -1, Length2 is 2); 
         getGreenPathLength(Player,Board,Length2)
     ),
-    AuxValue is (5-Length)*4,
-    AuxValue1 is (5-Length1)*4,
-    AuxValue2 is (5-Length2)*4,
+    AuxValue is (2-Length)*4,
+    AuxValue1 is (2-Length1)*4,
+    AuxValue2 is (2-Length2)*4,
     PathValue is AuxValue + AuxValue1 + AuxValue2.
  
 getOrangePathLength(Player,Board,Length):-
@@ -116,7 +116,7 @@ getGreenPathLength(Player,Board,Length):-
     
 getPathLengthWrapper(Board,ToVisit,[],Allied,Color,Depth,Length):-
     (
-        Depth =:= 5,
+        Depth =:= 2,
         Length is Depth
     );
     (
