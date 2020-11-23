@@ -357,7 +357,7 @@ updateNPieces(Move,NPieces,NewNPieces):-
     ).
 
 
-game_loop(GameState,Player,Winner,0,_):-  %PvP  (0)
+game_loop(GameState,Player,Winner,1,_,_):-  %PvP  (1)
     [Board | T] = GameState,
     [ColorsWon , NPieces | _] = T,
     display_game(GameState,Player),
@@ -374,13 +374,13 @@ game_loop(GameState,Player,Winner,0,_):-  %PvP  (0)
             number(Winner)  % in case there is a winner already the game loop is finished
         );
         (
-            game_loop([NewBoard,NewColorsWon,NewNPieces],NewPlayer,Winner)
+            game_loop([NewBoard,NewColorsWon,NewNPieces],NewPlayer,Winner,1,_,_)
         )
     ).
 
 
       
-game_loop(GameState,Player,Winner,1,Level):- %PvAI  (1)
+game_loop(GameState,Player,Winner,2,Level,_):- %PvAI  (2)
     [Board | T] = GameState,
     [ColorsWon , NPieces | _] = T,
     display_game(GameState,Player),
@@ -405,14 +405,107 @@ game_loop(GameState,Player,Winner,1,Level):- %PvAI  (1)
             number(Winner)  % in case there is a winner already the game loop is finished
         );
         (
-            game_loop([NewBoard,NewColorsWon,NewNPieces],NewPlayer,Winner,1,Level)
+            game_loop([NewBoard,NewColorsWon,NewNPieces],NewPlayer,Winner,2,Level,_)
         )
     ).
 
+game_loop(GameState,Player,Winner,3,Level,_):- %AIvP  (3)
+    [Board | T] = GameState,
+    [ColorsWon , NPieces | _] = T,
+    display_game(GameState,Player),
+    (
+        (
+            Player =:= 1,
+            get_move(Move,Board, NPieces)
+        );
+        (
+            choose_move(GameState,Player,Level,Move)
+        )
+    ),
+    updateNPieces(Move,NPieces,NewNPieces),
+    move(GameState, Move, NewGameState),    
+    [NewBoard | _] = NewGameState,
+    updateColorsWon([NewBoard, ColorsWon], NewColorsWon, Player),
+    !,
+    game_over([NewBoard,NewColorsWon,NewNPieces],Winner),
+    update_player(Player, NewPlayer),
+    (
+       (
+            number(Winner)  % in case there is a winner already the game loop is finished
+        );
+        (
+            game_loop([NewBoard,NewColorsWon,NewNPieces],NewPlayer,Winner,3,Level,_)
+        )
+    ).
+
+game_loop(GameState,Player,Winner,4,Level1,Level2):- %AIvAI  (4)
+    [_ | T] = GameState,
+    [ColorsWon , NPieces | _] = T,
+    display_game(GameState,Player),
+    (
+        (
+            Player =:= 1,
+            choose_move(GameState,Player,Level2,Move)
+        );
+        (
+            choose_move(GameState,Player,Level1,Move)
+        )
+    ),
+    updateNPieces(Move,NPieces,NewNPieces),
+    move(GameState, Move, NewGameState),    
+    [NewBoard | _] = NewGameState,
+    updateColorsWon([NewBoard, ColorsWon], NewColorsWon, Player),
+    !,
+    game_over([NewBoard,NewColorsWon,NewNPieces],Winner),
+    update_player(Player, NewPlayer),
+    (
+       (
+            number(Winner)  % in case there is a winner already the game loop is finished
+        );
+        (
+            game_loop([NewBoard,NewColorsWon,NewNPieces],NewPlayer,Winner,4,Level1,Level2)
+        )
+    ).
+
+
+get_bot_dificulty(1,_, _):- !.
+get_bot_dificulty(4, Difficulty1, Difficulty2):- 
+    !,
+    repeat,
+        write('         Difficulty for BOT 1:'), nl,
+        write('         1) Easy'), nl,
+        write('         2) Medium'), nl,
+        read(AuxDifficulty1),
+        number(AuxDifficulty1),
+        between(1,2,AuxDifficulty1), !,
+    repeat,
+        write('         Difficulty for BOT 2:'), nl,
+        write('         1) Easy'), nl,
+        write('         2) Medium'), nl,
+        read(AuxDifficulty2),
+        number(AuxDifficulty2),
+        between(1,2,AuxDifficulty2), !,
+    Difficulty1 = AuxDifficulty1,
+    Difficulty2 = AuxDifficulty2.
+
+get_bot_dificulty(_, Difficulty1, _):- 
+    !,
+    repeat,
+        write('         Difficulty for the BOT:'), nl,
+        write('         1) Easy'), nl,
+        write('         2) Medium'), nl,
+        read(AuxDifficulty1),
+        number(AuxDifficulty1),
+        between(1,2,AuxDifficulty1), !,
+    Difficulty1 = AuxDifficulty1.
+
 play :-
     prompt(_,''),
+    display_name,
+    display_mode(Mode),
+    get_bot_dificulty(Mode, Difficulty1, Difficulty2),
     player(Player),
     initial(Board),
-    game_loop([Board,[-1,-1,-1],[42,42,42]],Player,Winner,1,2),
+    game_loop([Board,[-1,-1,-1],[42,42,42]], Player, Winner, Mode, Difficulty1, Difficulty2),
     display_winner(Winner).
 

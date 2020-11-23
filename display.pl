@@ -1,19 +1,20 @@
+:- use_module(library(between)).
 
 initial([
               [empty,empty],                           %even
             [empty,empty,empty],                       %odd
           [empty,empty,empty,empty],                   %even
-        [orange,empty,empty,empty,empty],               %odd
-      [empty,orange,empty,empty,empty,empty],           %even
-        [empty,orange,empty,empty,empty],               %odd
-      [empty,orange,empty,empty,empty,empty],           %even
-    [empty,empty,orange,empty,empty,empty,empty],       %odd
-      [empty,empty,orange,empty,empty,empty],           %even
-    [empty,empty,orange,empty,empty,empty,empty],       %odd
-      [empty,empty,orange,empty,empty,empty],           %even
-    [empty,empty,empty,orange,empty,empty,empty],
-      [empty,empty,empty,orange,empty,empty],
-    [empty,empty,empty,empty,orange,empty,empty],
+        [empty,empty,empty,empty,empty],               %odd
+      [empty,empty,empty,empty,empty,empty],           %even
+        [empty,empty,empty,empty,empty],               %odd
+      [empty,empty,empty,empty,empty,empty],           %even
+    [empty,empty,empty,empty,empty,empty,empty],       %odd
+      [empty,empty,empty,empty,empty,empty],           %even
+    [empty,empty,empty,empty,empty,empty,empty],       %odd
+      [empty,empty,empty,empty,empty,empty],           %even
+    [empty,empty,empty,empty,empty,empty,empty],
+      [empty,empty,empty,empty,empty,empty],
+    [empty,empty,empty,empty,empty,empty,empty],
       [empty,empty,empty,empty,empty,empty],
     [empty,empty,empty,empty,empty,empty,empty],
       [empty,empty,empty,empty,empty,empty],
@@ -217,6 +218,28 @@ display_game(GameState,Player):-
     display_remaining_pieces(NPieces),
     display_colors(Colors),
     display_alliances.
+
+display_name:-
+  write('       $$$$$$\\  $$\\       $$\\       $$$$$$\\  $$$$$$\\  $$\\   $$\\  $$$$$$\\  $$$$$$$$\\  $$$$$$\\ '), nl,
+  write('      $$  __$$\\ $$ |      $$ |      \\_$$  _|$$  __$$\\ $$$\\  $$ |$$  __$$\\ $$  _____|$$  __$$\\ '), nl,
+  write('      $$ /  $$ |$$ |      $$ |        $$ |  $$ /  $$ |$$$$\\ $$ |$$ /  \\__|$$ |      $$ /  \\__|'), nl,
+  write('      $$$$$$$$ |$$ |      $$ |        $$ |  $$$$$$$$ |$$ $$\\$$ |$$ |      $$$$$\\    \\$$$$$$\\  '), nl,
+  write('      $$  __$$ |$$ |      $$ |        $$ |  $$  __$$ |$$ \\$$$$ |$$ |      $$  __|    \\____$$\\ '), nl,
+  write('      $$ |  $$ |$$ |      $$ |        $$ |  $$ |  $$ |$$ |\\$$$ |$$ |  $$\\ $$ |      $$\\   $$ |'), nl,
+  write('      $$ |  $$ |$$$$$$$$\\ $$$$$$$$\\ $$$$$$\\ $$ |  $$ |$$ | \\$$ |\\$$$$$$  |$$$$$$$$\\ \\$$$$$$  |'), nl,
+  write('      \\__|  \\__|\\________|\\________|\\______|\\__|  \\__|\\__|  \\__| \\______/ \\________| \\______/ '), nl, nl,
+  write('   ----------------------------------------------------------------------------------------------'), nl.
+
+display_mode(Mode):-
+  repeat,
+    write('         1) Player VS Player'), nl,
+    write('         2) Player VS AI'), nl,
+    write('         3) AI VS Player'), nl,
+    write('         4) AI VS AI'), nl,
+    read(AuxMode), number(AuxMode),
+    between(1,4,AuxMode), !,
+  Mode = AuxMode.
+
 
 display_winner(Winner):-
   WinningPlayer is Winner+1,
