@@ -1,6 +1,6 @@
 
 initial([
-              [empty,empty],                           %even
+              [empty,orange],                           %even
             [empty,empty,empty],                       %odd
           [empty,empty,empty,empty],                   %even
         [orange,empty,empty,empty,empty],               %odd
