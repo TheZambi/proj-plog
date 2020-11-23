@@ -6,8 +6,6 @@
 :- use_module(library(aggregate)).
 :- use_module(library(system)).
 
-:- dynamic player/1.
-
 player(0).
 
 
