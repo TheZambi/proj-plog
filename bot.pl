@@ -3,8 +3,9 @@ value(GameState, Player, Value):-
     captured_color_value(Player, ColorsWon, ColorValue),
     getPathValue(Player,ColorsWon,Board,PathValue),
     NewP is mod(Player+1,2),
-    getPathValue(NewP,ColorsWon,Board,Player2PathValue),
-    Value is ColorValue + PathValue - Player2PathValue.
+    Value is 0.
+    % getPathValue(NewP,ColorsWon,Board,Player2PathValue),
+    % Value is ColorValue + PathValue - Player2PathValue.
 
 captured_color_value(Player, ColorsWon,ColorValue):-
     count_occurrences(ColorsWon,Player,CountOfPlayer),
@@ -101,42 +102,35 @@ getPathValue(Player,ColorsWon,Board,PathValue):-
 getOrangePathLength(Player,Board,Length):-
     ToVisit = [[0,0],[1,0],[2,0],[3,0],[4,0]],
     allied(Player,orange,Allied),
-    getPathLengthWrapper(Board,ToVisit,[],Allied,orange,1,Length).
+    buildLevel(Board,[],ReturnLevel,ToVisit,[],Allied,orange),
+    write(ReturnLevel),
+    getPathLength(Board,Level1,Allied,orange,Length).
 
 
 getPurplePathLength(Player,Board,Length):-
     ToVisit = [[18,7],[19,8],[20,9],[21,10],[22,11]],
     allied(Player,purple,Allied),
-    getPathLengthWrapper(Board,ToVisit,[],Allied,purple,1,Length).
+    buildLevel(Board,[],ReturnLevel,ToVisit,[],Allied,purple),
+    getPathLength(Board,Level1,Allied,purple,Length).
 
 getGreenPathLength(Player,Board,Length):-
-    ToVisit = [[7,1],[9,2],[11,3],[13,4],[15,5]] ,
+    ToVisit = [[7,1],[9,2],[11,3],[13,4],[15,5]],
     allied(Player,green,Allied),
-    getPathLengthWrapper(Board,ToVisit,[],Allied,green,1,Length).
+    buildLevel(Board,[],ReturnLevel,ToVisit,[],Allied,green),
+    getPathLength(Board,Level1,Allied,green,Length).
     
-getPathLengthWrapper(Board,ToVisit,[],Allied,Color,Depth,Length):-
-    (
-        Depth =:= 2,
-        Length is Depth
-    );
-    (
-        getPathLength(Board,ToVisit,[],Allied,Color,Depth),
-        Length is Depth
-    );
-    (
-        NewDepth is Depth+1,
-        getPathLengthWrapper(Board,ToVisit,[],Allied,Color,NewDepth,Length)
-    ).
 
-getPathLength(_,[],_,_,_,_):- fail.
-getPathLength(Board,ToVisit,Visited,Allied,CheckingColor,Depth):-
-    Depth > 0,
+buildLevel(_,Level1,Level1,[],_,_,_).
+buildLevel(Board,Level1,ReturnLevel,ToVisit,Visited,Allied,CheckingColor):-
+    % trace,
+    % write(ToVisit),nl,
     [H|T] = ToVisit,
+    % write(ToVisit),nl,
+    % write(Visited), nl, 
+    [Row,Diagonal | _] = H,
     (
-        
         (
             \+member(H,Visited),
-            [Row,Diagonal | _ ] = H,
             valid_line(Row),
             diagonal_index(Row,D1),
             diagonal_index_end(Row,D2),
@@ -144,41 +138,43 @@ getPathLength(Board,ToVisit,Visited,Allied,CheckingColor,Depth):-
             getValue(Board,Row,Diagonal,Row,Color),
             (
                 (
-                    (Color == CheckingColor; Color == Allied),
-                    (
-                        at_border(CheckingColor, Row, Diagonal);
-                        (
-                            getNeighbours(Row, Diagonal, Neighbours),
-                            !,
-                            (
-                                getPathLength(Board,Neighbours,[H | Visited],Allied,CheckingColor,Depth);
-                                getPathLength(Board,T,[H | Visited],Allied,CheckingColor,Depth)
-                            )
-                        )
-                    )
+                    (Color == Allied; Color == CheckingColor),
+                    getNeighbours(Row,Diagonal,Neighbours),
+                    append(Neighbours,T,Aux),
+                    append([H],Visited,Aux2),
+                    remove_dups(Aux,NoDupes),
+                    %write('Allied or Color, adding neighbours : '),write(Row),write('  '),write(Diagonal),nl,
+                    buildLevel(Board,Level1,ReturnLevel,NoDupes,Aux2,Allied,CheckingColor)
                 );
                 (
-                    Color == empty,
-                    (
-                        at_border(CheckingColor, Row, Diagonal);
-                        (
-                            getNeighbours(Row, Diagonal, Neighbours),
-                            AuxDepth is Depth-1,
-                            !,
-                            (
-                                getPathLength(Board,Neighbours,[H | Visited],Allied,CheckingColor,AuxDepth);
-                                getPathLength(Board,T,[H | Visited],Allied,CheckingColor,Depth)
-                            )
-                        )
-                    )
+                    (Color == empty),
+                    %getNeighbours(Row,Diagonal,Neighbours),
+                    %append(Neighbours,T,Aux),
+                    append([H],Visited,Aux2),
+                    remove_dups(T,NoDupes),
+                    buildLevel(Board,[H|Level1],ReturnLevel,NoDupes,Aux2,Allied,CheckingColor)
+                );
+                (
+                    getNeighbours(Row,Diagonal,Neighbours),
+                    append(Neighbours,T,Aux),
+                    append([H],Visited,Aux2),
+                    remove_dups(Aux,NoDupes),
+                    buildLevel(Board,Level1,ReturnLevel,NoDupes,Aux2,Allied,CheckingColor)
                 )
             )
-            
-        );
+        ); 
         (
-            !,getPathLength(Board,T,[H | Visited],Allied,CheckingColor,Depth)
+            append([H],Visited,Aux2),
+            remove_dups(T,NoDupes),
+            buildLevel(Board,Level1,ReturnLevel,NoDupes,Aux2,Allied,CheckingColor)
         )
     ).
+
+
+
+getPathLength(Board,Level,Allied,CheckingColor,Depth):-
+    
+
 
 
 get_random_move([Move|_],0,Move).
