@@ -228,8 +228,9 @@ getPathLength(Board,ToVisit,LastVisited,Allied,CheckingColor,CurrentDepth,Depth)
     NewDepth is CurrentDepth+1,
     append(ReturnLevel,NewLevel,FinishedLevel),
     append(Visited,NewLevel,NewVisited),
-    getNextPossibleVisited(FinishedLevel,[],NewToVisitNext),
-    remove_list(NewToVisitNext,NewVisited,NextListOfTiles),
+    getNextPossibleVisited(NewLevel,[],NewToVisitNext),
+    append(NewToVisitNext,ToVisitNext,Aux),
+    remove_list(Aux,NewVisited,NextListOfTiles),
     (
         (
             \+stopCondition(CheckingColor,FinishedLevel),

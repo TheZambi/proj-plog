@@ -85,13 +85,11 @@ game_over(GameState, Winner):-
 
 valid_line(Line):-
     number(Line),
-    Line >= 0,
-    Line =< 22.
+    between(0,22,Line).
   
 valid_diagonal(Diagonal, D1, D2):-
     number(Diagonal),
-    Diagonal >= D1,
-    Diagonal =< D2.
+    between(D1,D2,Diagonal).
     
 
 getNeighbours(Row,Diagonal,Neighbours):-
