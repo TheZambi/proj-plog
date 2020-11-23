@@ -43,15 +43,11 @@ update_player(Player, NewPlayer):-
     NewPlayer is mod(Player+1,2).
 
 
-getValue([Row|_],0,Diagonal,InitialRow,Color):-
-    diagonal_index(InitialRow,X),
-    IndexInRow is Diagonal-X,
-    nth0(IndexInRow,Row,Color).
-
-getValue([_|T],RowNumber,Diagonal,InitialRow,Color):-
-    RowNumber > 0,
-    NewRowNumber is RowNumber-1,
-    getValue(T,NewRowNumber,Diagonal,InitialRow,Color).
+getValue(Board,RowNumber,Diagonal,Color):-
+    nth0(RowNumber,Board,Row),
+    diagonal_index(RowNumber,DiagonalStart),
+    DiagonalDiff is Diagonal-DiagonalStart,
+    nth0(DiagonalDiff,Row,Color).
 
 
 % gotten from https://stackoverflow.com/questions/8519203/prolog-replace-an-element-in-a-list-at-a-specified-index/8544713
@@ -289,7 +285,7 @@ checkLine(Board,ToVisit,Visited,Allied,CheckingColor, Fencing):-
             diagonal_index(Row,D1),
             diagonal_index_end(Row,D2),
             valid_diagonal(Diagonal,D1,D2),
-            getValue(Board,Row,Diagonal,Row,Color),
+            getValue(Board,Row,Diagonal,Color),
             (Color == CheckingColor; Color == Allied; (Fencing =:= 1, Color == empty)),
             (
                 at_border(CheckingColor, Row, Diagonal);

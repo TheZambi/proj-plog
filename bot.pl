@@ -96,7 +96,6 @@ getPathValue(Player,ColorsWon,Board,PathValue):-
     AuxValue is (9-Length)*(9-Length)*(9-Length),
     AuxValue1 is (9-Length1)*(9-Length1)*(9-Length1),
     AuxValue2 is (9-Length2)*(9-Length2)*(9-Length2),
-    %write(AuxValue), write('  '),write(Length1), write('  '),write(Length2), write('  '), nl,
     PathValue is AuxValue + AuxValue1 + AuxValue2.
 
 getOrangePathLength(Player,Board,Length):-
@@ -127,7 +126,7 @@ buildLevel(Board,Level1,ReturnLevel,ToVisit,Visited,NewVisited,Allied,CheckingCo
             diagonal_index(Row,D1),
             diagonal_index_end(Row,D2),
             valid_diagonal(Diagonal,D1,D2),
-            getValue(Board,Row,Diagonal,Row,Color),
+            getValue(Board,Row,Diagonal,Color),
             (
                 (
                     (Color == Allied; Color == CheckingColor),
@@ -178,7 +177,7 @@ fillFinishLevel(Board,ToVisitNext,Visited,Aux,NewLevel,CheckingColor,Allied):-
             diagonal_index(Row,D1),
             diagonal_index_end(Row,D2),
             valid_diagonal(Diagonal,D1,D2),
-            getValue(Board,Row,Diagonal,Row,Color),
+            getValue(Board,Row,Diagonal,Color),
             (Color == CheckingColor; Color == Allied), 
             getNeighbours(Row,Diagonal,Neighbours),
             fillFinishLevel(Board,[Neighbours | ToVisitNext], [H | Visited], [H | Aux], NewLevel,CheckingColor,Allied)
@@ -241,28 +240,20 @@ getPathLength(Board,ToVisit,LastVisited,Allied,CheckingColor,CurrentDepth,Depth)
         )
     ).
 
-
-
-get_random_move([Move|_],0,Move).
-get_random_move(ListOfMoves,RandomMove,Move):-
-    NewRandomMove is RandomMove-1,
-    [_ | T] = ListOfMoves,
-    get_random_move(T, NewRandomMove, Move).
-
 choose_move(GameState,Player,1,Move):- 
     valid_moves(GameState,Player, ListOfMoves),
     length(ListOfMoves,Length),
     random(0,Length,RandomMove),
-    get_random_move(ListOfMoves,RandomMove,Move), sleep(1).
+    nth0(RandomMove,ListOfMoves,Move), sleep(1).
 
 choose_move(GameState,Player,2,Move):- 
     valid_moves(GameState,Player, ListOfMoves),
     simMoves(GameState,ListOfMoves,Player,_BestMove,-10000, NewMove),
     length(NewMove,Length),
     random(0,Length,RandomMove),
-    get_random_move(NewMove,RandomMove,Move),
-    [Row,Diagonal,Color] = Move, nl,
-    write('Putting piece of color '), write(Color), write(' at row '), write(Row), write(' and diagonal '), write(Diagonal).
+    nth0(RandomMove,NewMove,Move),
+    [Row,Diagonal,Color] = Move,
+    write('Putting piece of color '), write(Color), write(' at row '), write(Row), write(' and diagonal '), write(Diagonal), nl.
 
 simMoves(_,[],_, BestMove,_, BestMove).
 simMoves(GameState,ListOfMoves,Player, BestMove,BestMoveValue, FinalBestMove):-
@@ -273,7 +264,6 @@ simMoves(GameState,ListOfMoves,Player, BestMove,BestMoveValue, FinalBestMove):-
     [NewBoard | _] = NewGameState,
     updateColorsWon([NewBoard, ColorsWon], NewColorsWon, Player),
     value([NewBoard,NewColorsWon], Player, Value),
-    %write(Value),write('  '), write(Move), nl,
     (
         (
             Value > BestMoveValue,
