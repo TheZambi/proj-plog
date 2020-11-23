@@ -10,8 +10,8 @@ captured_color_value(Player, ColorsWon,ColorValue):-
     count_occurrences(ColorsWon,Player,CountOfPlayer),
     NewP is mod(Player+1,2),
     count_occurrences(ColorsWon,NewP,CountOfOpponent),
-    AuxValue is 0 + CountOfPlayer * 70,
-    ColorValue is AuxValue - (CountOfOpponent * 70).
+    AuxValue is 0 + CountOfPlayer * 400,
+    ColorValue is AuxValue - (CountOfOpponent * 400).
 
 iterateRow([],_,_,_,NewListOfMoves,NewListOfMoves).
 iterateRow(Row,CurrentRow,CurrentDiagonal,NPieces,ListOfMoves,FinalListOfMoves):-
@@ -82,20 +82,21 @@ valid_moves(GameState, _Player ,FinalListOfMoves):-
 getPathValue(Player,ColorsWon,Board,PathValue):-
     [Orange,Purple,Green] = ColorsWon,
     (
-        (Orange \== -1, Length is 13) ; 
+        (Orange \== -1, Length is 9) ; 
         getOrangePathLength(Player,Board,Length)
     ),
     (
-        (Purple \==  -1, Length1 is 13);
+        (Purple \==  -1, Length1 is 9);
         getPurplePathLength(Player,Board,Length1)
     ),
     (
-        (Green \==  -1, Length2 is 13); 
+        (Green \==  -1, Length2 is 9); 
         getGreenPathLength(Player,Board,Length2)
     ),
-    AuxValue is (13-Length)*3,
-    AuxValue1 is (13-Length1)*3,
-    AuxValue2 is (13-Length2)*3,
+    AuxValue is (9-Length)*(9-Length)*(9-Length),
+    AuxValue1 is (9-Length1)*(9-Length1)*(9-Length1),
+    AuxValue2 is (9-Length2)*(9-Length2)*(9-Length2),
+    %write(AuxValue), write('  '),write(Length1), write('  '),write(Length2), write('  '), nl,
     PathValue is AuxValue + AuxValue1 + AuxValue2.
 
 getOrangePathLength(Player,Board,Length):-
@@ -256,7 +257,10 @@ choose_move(GameState,Player,1,Move):-
 
 choose_move(GameState,Player,2,Move):- 
     valid_moves(GameState,Player, ListOfMoves),
-    simMoves(GameState,ListOfMoves,Player,_BestMove,-10000, Move),
+    simMoves(GameState,ListOfMoves,Player,_BestMove,-10000, NewMove),
+    length(NewMove,Length),
+    random(0,Length,RandomMove),
+    get_random_move(NewMove,RandomMove,Move),
     [Row,Diagonal,Color] = Move, nl,
     write('Putting piece of color '), write(Color), write(' at row '), write(Row), write(' and diagonal '), write(Diagonal).
 
@@ -269,10 +273,16 @@ simMoves(GameState,ListOfMoves,Player, BestMove,BestMoveValue, FinalBestMove):-
     [NewBoard | _] = NewGameState,
     updateColorsWon([NewBoard, ColorsWon], NewColorsWon, Player),
     value([NewBoard,NewColorsWon], Player, Value),
+    %write(Value),write('  '), write(Move), nl,
     (
         (
-        Value > BestMoveValue,
-        simMoves(GameState,T,Player,Move,Value,FinalBestMove)
-        ); simMoves(GameState,T,Player,BestMove,BestMoveValue,FinalBestMove)
+            Value > BestMoveValue,
+            simMoves(GameState,T,Player,[Move],Value,FinalBestMove)
+        ); 
+        (
+            Value =:= BestMoveValue,
+            simMoves(GameState,T,Player,[Move | BestMove],BestMoveValue,FinalBestMove)
+        ); 
+        simMoves(GameState,T,Player,BestMove,BestMoveValue,FinalBestMove)
     ).
     

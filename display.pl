@@ -1,13 +1,13 @@
 
 initial([
-              [empty,orange],                           %even
+              [empty,empty],                           %even
             [empty,empty,empty],                       %odd
           [empty,empty,empty,empty],                   %even
         [orange,empty,empty,empty,empty],               %odd
       [empty,orange,empty,empty,empty,empty],           %even
         [empty,orange,empty,empty,empty],               %odd
       [empty,orange,empty,empty,empty,empty],           %even
-    [empty,orange,orange,empty,empty,empty,empty],       %odd
+    [empty,empty,orange,empty,empty,empty,empty],       %odd
       [empty,empty,orange,empty,empty,empty],           %even
     [empty,empty,orange,empty,empty,empty,empty],       %odd
       [empty,empty,orange,empty,empty,empty],           %even
